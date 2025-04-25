@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>課程查詢系統 | 優質教育從這裡開始</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --accent-color: #e74c3c;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path fill="rgba(255,255,255,0.1)" d="M0,0 L100,0 L100,100 L0,100 Z" /></svg>');
+            opacity: 0.3;
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .hero-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            background-color: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .hero-text {
+            flex: 1;
+            padding-right: 30px;
+        }
+        
+        .hero-text h2 {
+            color: var(--dark-color);
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+        
+        .hero-text p {
+            margin-bottom: 20px;
+            color: #666;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(231, 76, 60, 0.4);
+        }
+        
+        .hero-image {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .hero-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+        
+        .timetable-section {
+            background-color: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .section-title h2 {
+            font-size: 1.8rem;
+            color: var(--dark-color);
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+        
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+        }
+        
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .tab-button {
+            padding: 12px 25px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #666;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-button.active {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary-color);
+        }
+        
+        .search-container {
+            display: flex;
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 1px solid #ddd;
+            border-radius: 50px 0 0 50px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        .search-input:focus {
+            border-color: var(--primary-color);
+        }
+        
+        .search-button {
+            padding: 12px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0 50px 50px 0;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .search-button:hover {
+            background-color: #2980b9;
+        }
+        
+        .pdf-container {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .pdf-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .page-controls {
+            display: flex;
+            align-items: center;
+        }
+        
+        .page-controls button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin: 0 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .page-controls button:hover {
+            background-color: #2980b9;
+            transform: scale(1.05);
+        }
+        
+        .page-controls span {
+            margin: 0 10px;
+            font-weight: 500;
+        }
+        
+        .download-button {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .download-button:hover {
+            background-color: #27ae60;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
+        }
+        
+        .download-button i {
+            margin-right: 8px;
+        }
+        
+        .features-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .feature-card {
+            background-color: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-align: center;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: var(--dark-color);
+        }
+        
+        .feature-card p {
+            color: #666;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-section {
+                flex-direction: column;
+            }
+            
+            .hero-text {
+                padding-right: 0;
+                margin-bottom: 30px;
+                text-align: center;
+            }
+            
+            .pdf-container {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>課程查詢系統</h1>
+            <p>探索我們豐富多元的課程安排，體驗優質的教育環境與教學資源</p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <section class="hero-section">
+            <div class="hero-text">
+                <h2>歡迎來到我們的課程查詢平台</h2>
+                <p>在這裡，您可以輕鬆查詢班級與教師的課程安排，了解我們豐富的教學內容與專業的師資團隊。</p>
+                <p>我們致力於提供最優質的教育環境，培養學生的多元能力與國際視野。</p>
+                <a href="#timetable" class="cta-button">立即查詢課程 <i class="fas fa-arrow-down"></i></a>
+            </div>
+            <div class="hero-image">
+                <img src="https://via.placeholder.com/500x300?text=School+Learning+Environment" alt="學校學習環境">
+            </div>
+        </section>
+        
+        <section class="features-section">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <h3>豐富課程</h3>
+                <p>提供多元化的課程選擇，滿足不同學生的學習需求與興趣發展。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+                <h3>專業師資</h3>
+                <p>由經驗豐富的專業教師團隊授課，確保教學品質與學習效果。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h3>卓越成果</h3>
+                <p>歷年來培養出眾多優秀學生，升學與競賽表現亮眼。</p>
+            </div>
+        </section>
+        
+        <section id="timetable" class="timetable-section">
+            <div class="section-title">
+                <h2>課程查詢系統</h2>
+            </div>
+            
+            <div class="tabs">
+                <button class="tab-button active" onclick="switchTab('class')">班級課表</button>
+                <button class="tab-button" onclick="switchTab('teacher')">教師課表</button>
+            </div>
+            
+            <div class="search-container">
+                <input type="text" id="searchInput" class="search-input" placeholder="輸入班級或教師名稱...">
+                <button class="search-button" onclick="searchPDF()"><i class="fas fa-search"></i> 搜尋</button>
+            </div>
+            
+            <div class="pdf-controls">
+                <div class="page-controls">
+                    <button onclick="prevPage()"><i class="fas fa-chevron-left"></i></button>
+                    <span id="pageNum">1</span> / <span id="pageCount">0</span>
+                    <button onclick="nextPage()"><i class="fas fa-chevron-right"></i></button>
+                </div>
+                <button class="download-button" onclick="downloadPDF()"><i class="fas fa-download"></i> 下載課表</button>
+            </div>
+            
+            <div class="pdf-container">
+                <canvas id="pdfCanvas"></canvas>
+            </div>
+        </section>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>© 2023 學校名稱 版權所有 | 聯絡我們: info@school.edu.tw | 電話: (02) 1234-5678</p>
+        </div>
+    </footer>
+
+    <script>
+        // 初始化PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
+        
+        let currentPDF = null;
+        let currentPage = 1;
+        let currentTab = 'class';
+        let scale = 1.5;
+        
+        // PDF文件路徑 - 請替換為實際的PDF文件URL
+        const pdfFiles = {
+            'class': 'https://www.pkvs.ylc.edu.tw/ischool/public/resource_view/open.php?file=8362c3359a839f94aec0a1a0183053ef.pdf', // 替換為實際班級課表PDF路徑
+            'teacher': 'https://www.pkvs.ylc.edu.tw/ischool/public/resource_view/open.php?file=ae1ff7c9da6a5a17e25994d6de5aa047.pdf' // 替換為實際教師課表PDF路徑
+        };
+        
+        // 初始化載入班級課表
+        window.onload = function() {
+            loadPDF(pdfFiles['class']);
+        };
+        
+        // 載入PDF文件
+        function loadPDF(url) {
+            currentPage = 1;
+            
+            pdfjsLib.getDocument(url).promise.then(function(pdf) {
+                currentPDF = pdf;
+                document.getElementById('pageCount').textContent = pdf.numPages;
+                renderPage(currentPage);
+            }).catch(function(error) {
+                console.error('PDF載入錯誤:', error);
+                alert('無法載入PDF文件，請稍後再試。');
+            });
+        }
+        
+        // 渲染指定頁面
+        function renderPage(pageNum) {
+            if (!currentPDF) return;
+            
+            currentPDF.getPage(pageNum).then(function(page) {
+                const canvas = document.getElementById('pdfCanvas');
+                const context = canvas.getContext('2d');
+                const viewport = page.getViewport({ scale: scale });
+                
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                
+                document.getElementById('pageNum').textContent = pageNum;
+                
+                page.render({
+                    canvasContext: context,
+                    viewport: viewport
+                });
+            });
+        }
+        
+        // 切換標籤
+        function switchTab(tab) {
+            currentTab = tab;
+            currentPage = 1;
+            
+            // 更新活動標籤樣式
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // 載入對應的PDF
+            loadPDF(pdfFiles[tab]);
+        }
+        
+        // 上一頁
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderPage(currentPage);
+            }
+        }
+        
+        // 下一頁
+        function nextPage() {
+            if (currentPDF && currentPage < currentPDF.numPages) {
+                currentPage++;
+                renderPage(currentPage);
+            }
+        }
+        
+        // 搜尋PDF內容
+        function searchPDF() {
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            if (!searchTerm) return;
+            
+            alert('搜尋功能: ' + searchTerm + '\n\n此功能需要PDF文本內容支持，您的PDF文件已具備OCR識別，可以實現文本搜尋。實際應用中可實現跳轉到包含搜尋文本的頁面並高亮顯示結果。');
+            
+            // 實際實現可能需要更複雜的代碼來處理PDF文本搜尋
+            // 這裡只是一個示意
+        }
+        
+        // 下載PDF
+        function downloadPDF() {
+            const link = document.createElement('a');
+            link.href = pdfFiles[currentTab];
+            link.download = currentTab === 'class' ? '班級課表.pdf' : '教師課表.pdf';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
